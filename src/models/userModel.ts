@@ -16,6 +16,8 @@ import { Provider, Role } from "../common/constants";
  * @property {string} password - The user's hashed password
  * @property {Role} role - The user's role in the system
  * @property {boolean} [isEmailVerified] - Whether the user's email has been verified
+ * @property {string} [emailVerificationToken] - Token used to verify the user's email
+ * @property {Date} [emailVerificationExpires] - Expiration date for the email verification token
  * @property {string} [imageUrl] - URL to the user's profile image
  * @property {Provider} provider - The authentication provider
  * @property {string} [googleId] - Google ID for users authenticated via Google
@@ -67,6 +69,14 @@ const UserSchema = new Schema(
     isEmailVerified: {
       type: Boolean,
       default: false,
+    },
+    emailVerificationToken: {
+      type: String,
+      select: false,
+    },
+    emailVerificationExpires: {
+      type: Date,
+      select: false,
     },
     provider: {
       type: String,
