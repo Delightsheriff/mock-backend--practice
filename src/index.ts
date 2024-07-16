@@ -6,7 +6,6 @@
  * The middleware is arranged in a specific order to ensure optimal security and performance.
  */
 
-// Import necessary modules
 import express, { Application, Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
@@ -21,7 +20,7 @@ import { ENVIRONMENT } from "./common/config/environment";
 // Initialize Express application
 const app: Application = express();
 
-// Set up environment variables
+// Environment variables
 const port = ENVIRONMENT.APP.PORT;
 const appName = ENVIRONMENT.APP.NAME;
 
@@ -53,7 +52,7 @@ app.use(
   rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour window
     limit: 1000, // Limit each IP to 1000 requests per window
-    message: "Too many requests from this IP, please try again in an hour.",
+    message: "Rate limit exceeded. Please try again later.",
   }),
 );
 
@@ -64,15 +63,43 @@ if (ENVIRONMENT.APP.ENV === "development") {
 
 // Route handling
 
-// Catch-all route for undefined routes
-app.all("*", (req: Request, res: Response) => {
-  return res.status(404).json({ error: "Route not found", statusCode: 404 });
+/**
+ * API welcome route
+ * @route GET /api/v1
+ * @returns {Object} 200 - Success response
+ */
+app.use("/api/v1", (req: Request, res: Response) => {
+  res.status(200).json({
+    statusText: "success",
+    message: "Welcome to Home-finder API",
+  });
 });
 
-// Global error handling middleware
+/**
+ * Catch-all route for undefined routes
+ * @route GET *
+ * @returns {Object} 404 - Not Found response
+ */
+app.all("*", (req: Request, res: Response) => {
+  return res.status(404).json({
+    statusText: "fail",
+    message: "The requested resource could not be found",
+  });
+});
+
+/**
+ * Global error handling middleware
+ * @param {Error} err - Error object
+ * @param {Request} req - Express request object
+ * @param {Response} res - Express response object
+ * @param {NextFunction} next - Express next function
+ */
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
-  res.status(500).json({ error: "Internal server error", statusCode: 500 });
+  res.status(500).json({
+    statusText: "fail",
+    message: "An unexpected error occurred. Please try again later.",
+  });
 });
 
 export default app;

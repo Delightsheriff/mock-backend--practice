@@ -1,29 +1,53 @@
-// server.ts
+/**
+ * Server Entry Point
+ *
+ * This file is responsible for starting the server, connecting to the database,
+ * and handling graceful shutdowns. It serves as the main entry point for the application.
+ */
 
 import { ENVIRONMENT } from "./common/config/environment";
 import app from "./index";
 import { connectDb } from "./common/config/database";
 
-const startServer = async () => {
+/**
+ * Starts the server and initializes the database connection.
+ * @async
+ * @throws Will exit the process if server start-up fails.
+ */
+const startServer = async (): Promise<void> => {
   try {
+    // Connect to the database
     await connectDb();
 
+    // Start the Express server
     app.listen(ENVIRONMENT.APP.PORT, () => {
       console.log(
-        `=> ${ENVIRONMENT.APP.NAME} app listening on port ${ENVIRONMENT.APP.PORT}!`,
+        `=> ${ENVIRONMENT.APP.NAME} is running on port ${ENVIRONMENT.APP.PORT}`,
       );
     });
   } catch (error) {
-    console.error("Failed to start the server", error);
-    process.exit(1);
+    console.error("Failed to start the server:", error);
+    process.exit(1); // Exit with a failure code
   }
 };
 
+// Initialize the server
 startServer();
 
-// Handle graceful shutdown
+/**
+ * Graceful Shutdown Handler
+ *
+ * This event listener catches SIGINT signals (e.g., from Ctrl+C)
+ * and performs a graceful shutdown of the server.
+ */
 process.on("SIGINT", async () => {
-  console.log("Gracefully shutting down");
-  // Add any cleanup operations here
-  process.exit(0);
+  console.log("Initiating graceful shutdown...");
+
+  // TODO: Add cleanup operations here, such as:
+  // - Closing database connections
+  // - Finishing pending requests
+  // - Releasing other resources
+
+  console.log("Shutdown complete. Exiting process.");
+  process.exit(0); // Exit with a success code
 });
