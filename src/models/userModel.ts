@@ -7,6 +7,7 @@ import { CallbackError, Schema, model } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
+import { IUser } from "../common/interfaces/user";
 
 /**
  * @typedef {Object} UserDocument
@@ -29,7 +30,7 @@ import { Provider, Role } from "../common/constants";
  * Mongoose schema definition for the User model.
  * @type {Schema<UserDocument>}
  */
-const UserSchema = new Schema(
+const UserSchema = new Schema<IUser, unknown>(
   {
     firstName: {
       type: String,
@@ -113,7 +114,7 @@ UserSchema.pre("save", function (next) {
       this.properties = [];
     }
   } else {
-    this.properties = undefined;
+    this.properties = [];
   }
   next();
 });
@@ -145,6 +146,6 @@ UserSchema.virtual("fullName").get(function () {
  * Mongoose model for User documents.
  * @type {import('mongoose').Model<UserDocument>}
  */
-const User = model("User", UserSchema);
+const User = model<IUser>("User", UserSchema);
 
 export default User;

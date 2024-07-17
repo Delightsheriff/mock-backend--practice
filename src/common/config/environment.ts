@@ -1,9 +1,9 @@
-import type { IEnvironmant } from "../interfaces/environment";
+import type { IEnvironment } from "../interfaces/environment";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-export const ENVIRONMENT: IEnvironmant = {
+export const ENVIRONMENT: IEnvironment = {
   APP: {
     NAME: process.env.APP_NAME,
     PORT: parseInt(process.env.PORT || "2024"),
@@ -12,6 +12,10 @@ export const ENVIRONMENT: IEnvironmant = {
   },
   DB: {
     URL: process.env.DB_URL!,
+  },
+  EMAIL: {
+    USER: process.env.USER!,
+    PASSWORD: process.env.PASSWORD!,
   },
   JWT: {
     REFRESH_KEY: process.env.REFRESH_JWT_KEY!,

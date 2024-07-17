@@ -20,10 +20,6 @@ import { ENVIRONMENT } from "./common/config/environment";
 // Initialize Express application
 const app: Application = express();
 
-// Environment variables
-const port = ENVIRONMENT.APP.PORT;
-const appName = ENVIRONMENT.APP.NAME;
-
 // Middleware setup (in order of application)
 
 // 1. Set security-related HTTP headers

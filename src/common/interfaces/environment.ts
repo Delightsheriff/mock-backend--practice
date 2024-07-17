@@ -1,4 +1,4 @@
-export interface IEnvironmant {
+export interface IEnvironment {
   APP: {
     NAME?: string;
     PORT?: number;
@@ -7,6 +7,10 @@ export interface IEnvironmant {
   };
   DB: {
     URL: string;
+  };
+  EMAIL: {
+    USER: string;
+    PASSWORD: string;
   };
   JWT: {
     ACCESS_KEY: string;
