@@ -43,6 +43,7 @@ export const signUp = async (req: Request, res: Response) => {
 
     // Send verification email
     const origin = `${req.protocol}://${req.get("host")}`;
+    console.log("origin", origin);
     await sendVerificationEmail({
       user: {
         _id: user._id,

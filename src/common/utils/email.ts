@@ -42,15 +42,22 @@ export async function verifyEmailToken(
   token: string,
   user: IUserDocument,
 ): Promise<boolean> {
+  console.log(user);
   if (!user.emailVerificationToken || !user.emailVerificationExpiresAt) {
+    console.log("No token or expiration date in user document");
     return false;
   }
 
   const computedHash = await hashToken(token);
+  console.log(`Computed Hash: ${computedHash}`);
+  console.log(`Stored Hash: ${user.emailVerificationToken}`);
+
   if (computedHash !== user.emailVerificationToken) {
+    console.log("Hash mismatch");
     return false;
   }
   if (new Date() > user.emailVerificationExpiresAt) {
+    console.log("Token expired");
     return false;
   }
   return true;

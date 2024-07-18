@@ -1,23 +1,35 @@
 import { Request, Response } from "express";
 import User from "../../models/userModel";
-import { verifyEmailToken } from "../../common/utils/email";
-import { stat } from "fs";
+import { hashToken, verifyEmailToken } from "../../common/utils/email";
 
 export const verifyEmail = async (req: Request, res: Response) => {
-  const { token } = req.query;
+  const { token, email } = req.query;
+  console.log(`Token: ${token}, Email: ${email}`);
 
-  if (!token || typeof token !== "string") {
+  if (
+    !token ||
+    typeof token !== "string" ||
+    !email ||
+    typeof email !== "string"
+  ) {
+    console.log("Token or email is missing or not a string");
     return res.status(400).json({
       statusText: "fail",
-      message: "Token is required",
+      message: "Both token and email are required",
     });
   }
+
   try {
-    const user = await User.findOne({ emailVerificationToken: token });
+    // Find the user by email
+    const user = await User.findOne({ email })
+      .select("+emailVerificationToken +emailVerificationExpiresAt")
+      .exec();
+
     if (!user) {
+      console.log("User not found");
       return res.status(400).json({
         statusText: "fail",
-        message: "Invalid token or token expired",
+        message: "Invalid email or token",
       });
     }
 
@@ -25,6 +37,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const isValid = await verifyEmailToken(token, user);
 
     if (!isValid) {
+      console.log("new bug point");
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 

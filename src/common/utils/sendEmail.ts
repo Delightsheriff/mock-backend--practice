@@ -39,10 +39,13 @@ export async function sendVerificationEmail({
   // Save the hashed token and expiration to the user document
   await User.findByIdAndUpdate(user._id, {
     emailVerificationToken: hashedToken,
-    emailVerificationExpires: expiresAt,
+    emailVerificationExpiresAt: expiresAt,
   });
 
-  const verificationUrl = `${origin}/verify-email?token=${token}`;
+  // const verificationUrl = `${origin}/api/v1/auth/verify-email?token=${token}`;
+  const verificationUrl = `${origin}/api/v1/auth/verify-email?token=${token}&email=${encodeURIComponent(
+    user.email,
+  )}`;
 
   const mailOptions = {
     from: `House Finder ${ENVIRONMENT.EMAIL.USER}`,
@@ -52,7 +55,9 @@ export async function sendVerificationEmail({
       <h1>Email Verification</h1>
       <p>Hi ${user.firstName},</p>
       <p>Please click the link below to verify your email address:</p>
-      <a href="${verificationUrl}">Verify Email</a>
+      <a href="${verificationUrl}" 
+      _target="blank"
+      >Verify Email</a>
       <p>This link will expire in 24 hours.</p>
       <p>If you didn't request this, please ignore this email.</p>
     `,
