@@ -5,7 +5,6 @@
 
 import crypto from "crypto";
 import { promisify } from "util";
-import { IUser } from "../interfaces/user";
 import { IUserDocument } from "../../models/userModel";
 
 const randomBytes = promisify(crypto.randomBytes);

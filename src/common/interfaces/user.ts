@@ -8,8 +8,8 @@ export interface IUser {
   role: string;
   imageUrl: string;
   isEmailVerified: boolean;
-  emailVerificationToken: string;
-  emailVerificationExpiresAt: Date;
+  emailVerificationToken: string | null;
+  emailVerificationExpiresAt: Date | null;
   provider: string;
   googleId: string;
   refreshToken: string;
