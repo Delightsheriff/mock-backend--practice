@@ -6,13 +6,16 @@ import { Types } from "mongoose";
 
 // Configure the email transporter
 const transporter = nodemailer.createTransport({
-  // Replace these with your email service configuration
   host: "smtp.gmail.com",
-  port: 587,
-  secure: true, // Use TLS
+  port: 465,
+  secure: true, // Use SSL
   auth: {
     user: ENVIRONMENT.EMAIL.USER,
     pass: ENVIRONMENT.EMAIL.PASSWORD,
+  },
+  tls: {
+    // Do not fail on invalid certs
+    rejectUnauthorized: false,
   },
 });
 
@@ -35,13 +38,13 @@ export async function sendVerificationEmail({
   // Save the hashed token and expiration to the user document
   await User.findByIdAndUpdate(user._id, {
     emailVerificationToken: hashedToken,
-    emailVerificationTokenExpiresAt: expiresAt,
+    emailVerificationExpires: expiresAt,
   });
 
   const verificationUrl = `${origin}/verify-email?token=${token}`;
 
   const mailOptions = {
-    from: '"Your App Name" <noreply@yourapp.com>',
+    from: `House Finder ${ENVIRONMENT.EMAIL.USER}`,
     to: user.email,
     subject: "Verify Your Email",
     html: `

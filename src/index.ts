@@ -16,6 +16,8 @@ import cookieParser from "cookie-parser";
 import rateLimit from "express-rate-limit";
 import mongoSanitize from "express-mongo-sanitize";
 import { ENVIRONMENT } from "./common/config/environment";
+// import { authRouter } from "./routes/authRoutes";
+import authRoutes from "./routes/authRoutes";
 
 // Initialize Express application
 const app: Application = express();
@@ -60,11 +62,18 @@ if (ENVIRONMENT.APP.ENV === "development") {
 // Route handling
 
 /**
+ * API Auth routes
+ * @route POST /api/v1/auth
+ * @group Auth - Authentication and user management
+ */
+app.use("/api/v1/auth", authRoutes);
+
+/**
  * API welcome route
  * @route GET /api/v1
  * @returns {Object} 200 - Success response
  */
-app.use("/api/v1", (req: Request, res: Response) => {
+app.get("/api/v1", (req: Request, res: Response) => {
   res.status(200).json({
     statusText: "success",
     message: "Welcome to Home-finder API",

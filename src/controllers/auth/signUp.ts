@@ -6,6 +6,7 @@ import { sendVerificationEmail } from "../../common/utils/sendEmail";
 
 export const signUp = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role } = req.body;
+
   if (!firstName || !lastName || !email || !password || !role) {
     return res.status(400).json({
       statusText: "fail",
