@@ -2,7 +2,8 @@ import nodemailer from "nodemailer";
 import { generateEmailVerificationToken } from "./email";
 import User from "../../models/userModel";
 import { ENVIRONMENT } from "../config/environment";
-import { Types } from "mongoose";
+import { Schema } from "mongoose";
+// import { Types } from "mongoose";
 
 // Configure the email transporter
 const transporter = nodemailer.createTransport({
@@ -21,7 +22,7 @@ const transporter = nodemailer.createTransport({
 
 interface SendVerificationEmailParams {
   user: {
-    _id: Types.ObjectId;
+    _id: Schema.Types.ObjectId;
     email: string;
     firstName: string;
   };

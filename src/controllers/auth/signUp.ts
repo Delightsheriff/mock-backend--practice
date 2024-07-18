@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import User from "../../models/userModel";
+import User, { IUserDocument } from "../../models/userModel";
 import { hashPassword } from "../../common/utils/helpers";
 import { Provider, Role } from "../../common/constants";
 import { sendVerificationEmail } from "../../common/utils/sendEmail";
+// import { IUser } from "../../common/interfaces/user";
 
 export const signUp = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role } = req.body;
@@ -31,7 +32,7 @@ export const signUp = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hashPassword(password);
-    const user = await User.create({
+    const user: IUserDocument = await User.create({
       firstName,
       lastName,
       email,
@@ -42,19 +43,19 @@ export const signUp = async (req: Request, res: Response) => {
 
     // Send verification email
     const origin = `${req.protocol}://${req.get("host")}`;
-    await sendVerificationEmail({ user, origin });
+    await sendVerificationEmail({
+      user: {
+        _id: user._id,
+        email: user.email,
+        firstName: user.firstName,
+      },
+      origin,
+    });
 
     res.status(201).json({
-      statusText: "success",
       message:
         "User created successfully. Please check your email to verify your account.",
-      user: {
-        id: user._id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        role: user.role,
-      },
+      userId: user._id,
     });
   } catch (error) {
     console.error("Error during signup:", error);

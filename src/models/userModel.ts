@@ -3,7 +3,13 @@
  * @description Defines the Mongoose schema and model for User documents in the application.
  */
 
-import { CallbackError, Schema, model } from "mongoose";
+import mongoose, {
+  CallbackError,
+  Schema,
+  Model,
+  Document,
+  ObjectId,
+} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
@@ -27,10 +33,16 @@ import { IUser } from "../common/interfaces/user";
  */
 
 /**
- * Mongoose schema definition for the User model.
- * @type {Schema<UserDocument>}
+ * Interface for User documents in the database.
+ * @interface IUserDocument - User document interface
+ * @extends {IUser} - User interface with additional Mongoose document methods
+ * @extends {Document} - Mongoose document with additional methods and properties
  */
-const UserSchema = new Schema<IUser, unknown>(
+export interface IUserDocument extends IUser, Document {
+  _id: ObjectId;
+}
+
+const UserSchema = new Schema<IUserDocument>(
   {
     firstName: {
       type: String,
@@ -75,7 +87,7 @@ const UserSchema = new Schema<IUser, unknown>(
       type: String,
       select: false,
     },
-    emailVerificationExpires: {
+    emailVerificationExpiresAt: {
       type: Date,
       select: false,
     },
@@ -146,6 +158,9 @@ UserSchema.virtual("fullName").get(function () {
  * Mongoose model for User documents.
  * @type {import('mongoose').Model<UserDocument>}
  */
-const User = model<IUser>("User", UserSchema);
+const User: Model<IUserDocument> = mongoose.model<IUserDocument>(
+  "User",
+  UserSchema,
+);
 
 export default User;

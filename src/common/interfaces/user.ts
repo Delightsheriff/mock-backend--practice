@@ -9,7 +9,7 @@ export interface IUser {
   imageUrl: string;
   isEmailVerified: boolean;
   emailVerificationToken: string;
-  emailVerificationExpires: Date;
+  emailVerificationExpiresAt: Date;
   provider: string;
   googleId: string;
   refreshToken: string;

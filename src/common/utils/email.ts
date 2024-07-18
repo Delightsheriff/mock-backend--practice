@@ -5,6 +5,8 @@
 
 import crypto from "crypto";
 import { promisify } from "util";
+import { IUser } from "../interfaces/user";
+import { IUserDocument } from "../../models/userModel";
 
 const randomBytes = promisify(crypto.randomBytes);
 
@@ -34,25 +36,24 @@ export async function generateEmailVerificationToken(): Promise<EmailVerificatio
 /**
  * Verifies the email verification token
  * @param {string} token - The verification token sent to the user's email
- * @param {string} hashedToken - The hashed token stored in the user document
- * @param {Date} expiresAt - The expiration time of the token
+ * @param {IUserDocument} user - The user document to verify the token against
  * @returns {Promise<boolean>} A promise that resolves to true if the token is valid and not expired, false otherwise
  */
 export async function verifyEmailToken(
   token: string,
-  hashedToken: string,
-  expiresAt: Date,
+  user: IUserDocument,
 ): Promise<boolean> {
+  if (!user.emailVerificationToken || !user.emailVerificationExpiresAt) {
+    return false;
+  }
+
   const computedHash = await hashToken(token);
-
-  if (computedHash !== hashedToken) {
+  if (computedHash !== user.emailVerificationToken) {
     return false;
   }
-
-  if (new Date() > expiresAt) {
+  if (new Date() > user.emailVerificationExpiresAt) {
     return false;
   }
-
   return true;
 }
 
