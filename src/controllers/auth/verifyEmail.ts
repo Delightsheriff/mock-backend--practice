@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import User from "../../models/userModel";
-import { hashToken, verifyEmailToken } from "../../common/utils/email";
+import { verifyEmailToken } from "../../common/utils/email";
 
 export const verifyEmail = async (req: Request, res: Response) => {
   const { token, email } = req.query;
@@ -47,7 +47,11 @@ export const verifyEmail = async (req: Request, res: Response) => {
     user.emailVerificationExpiresAt = null;
     await user.save();
 
-    return res.status(200).json({ message: "Email verified successfully" });
+    return res.status(200).json({
+      statusText: "success",
+      message:
+        "Your email has been successfully verified. You can now access your account.",
+    });
   } catch (error) {
     console.error("Error verifying email:", error);
     return res

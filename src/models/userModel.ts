@@ -1,78 +1,57 @@
 /**
- * @file User.js
+ * @file User.ts
  * @description Defines the Mongoose schema and model for User documents in the application.
  */
 
-import mongoose, {
-  CallbackError,
-  Schema,
-  Model,
-  Document,
-  ObjectId,
-} from "mongoose";
+import mongoose, { Schema, Model, Document, CallbackError } from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
 import { IUser } from "../common/interfaces/user";
 
 /**
- * @typedef {Object} UserDocument
- * @property {string} firstName - The user's first name
- * @property {string} lastName - The user's last name
- * @property {string} email - The user's email address
- * @property {string} password - The user's hashed password
- * @property {Role} role - The user's role in the system
- * @property {boolean} [isEmailVerified] - Whether the user's email has been verified
- * @property {string} [emailVerificationToken] - Token used to verify the user's email
- * @property {Date} [emailVerificationExpires] - Expiration date for the email verification token
- * @property {string} [imageUrl] - URL to the user's profile image
- * @property {Provider} provider - The authentication provider
- * @property {string} [googleId] - Google ID for users authenticated via Google
- * @property {string} [refreshToken] - Refresh token for authentication
- * @property {Schema.Types.ObjectId[]} [properties] - Array of Property IDs owned by the user
- */
-
-/**
  * Interface for User documents in the database.
- * @interface IUserDocument - User document interface
- * @extends {IUser} - User interface with additional Mongoose document methods
- * @extends {Document} - Mongoose document with additional methods and properties
+ * Extends IUser (which defines basic user properties) and Document (for Mongoose document methods)
  */
 export interface IUserDocument extends IUser, Document {
-  _id: ObjectId;
+  fullName: string; // Virtual property
+  comparePassword(candidatePassword: string): Promise<boolean>; // Method to compare passwords
 }
 
+/**
+ * Mongoose schema definition for User documents
+ */
 const UserSchema = new Schema<IUserDocument>(
   {
     firstName: {
       type: String,
       required: [true, "First name is required"],
-      lowercase: true,
       trim: true,
+      set: (v: string) => v.toLowerCase(), // Converts to lowercase before saving
     },
     lastName: {
       type: String,
       required: [true, "Last name is required"],
-      lowercase: true,
       trim: true,
+      set: (v: string) => v.toLowerCase(), // Converts to lowercase before saving
     },
     email: {
       type: String,
       required: [true, "Email is required"],
       unique: true,
-      lowercase: true,
       trim: true,
-      validate: [validator.isEmail, "Please provide a valid email"],
+      lowercase: true,
+      validate: [validator.isEmail, "Please provide a valid email"], // Custom validator
     },
     password: {
       type: String,
       required: [true, "Password is required"],
       minlength: [8, "Password must be at least 8 characters long"],
-      select: false,
+      select: false, // Excludes password from query results by default
     },
     role: {
       type: String,
-      enum: Object.values(Role),
+      enum: Object.values(Role), // Restricts values to those defined in Role enum
       required: [true, "Role is required"],
     },
     imageUrl: {
@@ -83,58 +62,55 @@ const UserSchema = new Schema<IUserDocument>(
       type: Boolean,
       default: false,
     },
-    emailVerificationToken: {
-      type: String,
-      select: false,
-    },
-    emailVerificationExpiresAt: {
-      type: Date,
-      select: false,
-    },
+    emailVerificationToken: String,
+    emailVerificationExpiresAt: Date,
     provider: {
       type: String,
-      enum: Object.values(Provider),
-      required: true,
+      enum: Object.values(Provider), // Restricts values to those defined in Provider enum
       default: Provider.Local,
     },
-    googleId: {
-      type: String,
-      select: false,
-    },
-    refreshToken: {
-      type: String,
-      select: false,
-    },
-    properties: {
-      type: [{ type: Schema.Types.ObjectId, ref: "Property" }],
-      default: undefined,
-    },
+    googleId: String,
+    refreshToken: String,
+    properties: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
   },
   {
-    timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    toJSON: { virtuals: true }, // Includes virtual properties when document is converted to JSON
+    toObject: { virtuals: true }, // Includes virtual properties when document is converted to a plain object
   },
 );
 
 /**
- * Pre-save middleware to handle the properties field based on user role.
+ * Virtual property for full name
+ * Combines firstName and lastName
  */
-UserSchema.pre("save", function (next) {
+UserSchema.virtual("fullName").get(function (this: IUserDocument) {
+  return `${this.firstName} ${this.lastName}`;
+});
+
+/**
+ * Pre-save middleware to handle the properties field based on user role
+ * Ensures LANDLORD users have an array for properties, while other roles have it null
+ */
+UserSchema.pre("save", function (this: IUserDocument, next) {
   if (this.role === Role.LANDLORD) {
-    if (!this.properties) {
-      this.properties = [];
-    }
+    this.properties = this.properties || [];
   } else {
-    this.properties = [];
+    this.properties = null;
   }
   next();
 });
 
 /**
- * Pre-save middleware to hash password before saving.
+ * Pre-save middleware to hash password before saving
+ * Only hashes the password if it has been modified (or is new)
  */
-UserSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (this: IUserDocument, next) {
   if (!this.isModified("password")) return next();
 
   try {
@@ -147,16 +123,19 @@ UserSchema.pre("save", async function (next) {
 });
 
 /**
- * Virtual for user's full name.
- * @type {Schema.VirtualType}
+ * Method to compare a given password with the user's hashed password
+ * @param candidatePassword - The password to compare
+ * @returns A promise that resolves to a boolean indicating whether the passwords match
  */
-UserSchema.virtual("fullName").get(function () {
-  return `${this.firstName} ${this.lastName}`;
-});
+UserSchema.methods.comparePassword = async function (
+  this: IUserDocument,
+  candidatePassword: string,
+): Promise<boolean> {
+  return bcrypt.compare(candidatePassword, this.password);
+};
 
 /**
- * Mongoose model for User documents.
- * @type {import('mongoose').Model<UserDocument>}
+ * Mongoose model for User documents
  */
 const User: Model<IUserDocument> = mongoose.model<IUserDocument>(
   "User",

@@ -1,9 +1,7 @@
 import { Request, Response } from "express";
 import User, { IUserDocument } from "../../models/userModel";
-import { hashPassword } from "../../common/utils/helpers";
 import { Provider, Role } from "../../common/constants";
-import { sendVerificationEmail } from "../../common/utils/sendEmail";
-// import { IUser } from "../../common/interfaces/user";
+import { sendVerificationEmail } from "../../common/utils/sendVerificationEmail";
 
 export const signUp = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password, role } = req.body;
@@ -31,12 +29,11 @@ export const signUp = async (req: Request, res: Response) => {
       });
     }
 
-    const hashedPassword = await hashPassword(password);
     const user: IUserDocument = await User.create({
       firstName,
       lastName,
       email,
-      password: hashedPassword,
+      password,
       provider: Provider.Local,
       role,
     });

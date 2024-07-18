@@ -13,5 +13,5 @@ export interface IUser {
   provider: string;
   googleId: string;
   refreshToken: string;
-  properties: Schema.Types.ObjectId[];
+  properties: Schema.Types.ObjectId[] | null;
 }
