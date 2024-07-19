@@ -17,13 +17,11 @@ export const signIn = async (req: Request, res: Response) => {
       "+password +isEmailVerified +refreshToken",
     );
 
-    if (!user) {
+    if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({
         statusText: "fail",
         message: "Invalid email or password",
       });
     }
-
-    // const isValidPassword = await user.comparePassword(password);
   } catch (error) {}
 };

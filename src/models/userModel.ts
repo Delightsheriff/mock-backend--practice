@@ -47,9 +47,14 @@ const UserSchema = new Schema<IUserDocument>(
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [
+        function (this: IUserDocument) {
+          return this.provider === Provider.Local;
+        },
+        "Password is required for local accounts",
+      ],
       minlength: [8, "Password must be at least 8 characters long"],
-      select: false, // Excludes password from query results by default
+      select: false,
     },
     role: {
       type: String,
@@ -113,13 +118,17 @@ UserSchema.pre("save", function (this: IUserDocument, next) {
  * Only hashes the password if it has been modified (or is new)
  */
 UserSchema.pre("save", async function (this: IUserDocument, next) {
+  if (this.provider === Provider.Google) {
+    this.password = undefined;
+    return next();
+  }
   if (!this.isModified("password")) return next();
-
   try {
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password!, salt);
     next();
   } catch (error) {
+    console.error("Error hashing password:", error);
     next(error as CallbackError);
   }
 });
@@ -133,6 +142,9 @@ UserSchema.methods.comparePassword = async function (
   this: IUserDocument,
   candidatePassword: string,
 ): Promise<boolean> {
+  if (!this.password) {
+    return false;
+  }
   return bcrypt.compare(candidatePassword, this.password);
 };
 
