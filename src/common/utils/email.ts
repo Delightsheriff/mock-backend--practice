@@ -1,78 +1,57 @@
 /**
  * @file email.ts
- * @description Utility functions for handling email verification during user registration
+ * @description Provides utilities for generating, expiring, and verifying email tokens.
  */
 
-import crypto from "crypto";
-import { promisify } from "util";
-import { IUserDocument } from "../../models/userModel";
+import jwt from "jsonwebtoken";
+import { ENVIRONMENT } from "../config/environment";
 
-const randomBytes = promisify(crypto.randomBytes);
-
-interface EmailVerificationToken {
-  token: string;
-  hashedToken: string;
-  expiresAt: Date;
+interface ITokenData {
+  id: string;
 }
 
 /**
- * Generates an email verification token
- * @returns {Promise<EmailVerificationToken>} A promise that resolves to an object containing the token, its hash, and expiration time
+ * Generates a JWT token for email verification.
+ *
+ * @param userId - The user's ID to be encoded in the token
+ * @param expiresIn - Token expiration time (default: '24h')
+ * @returns An object containing the token and its expiration date
  */
-export async function generateEmailVerificationToken(): Promise<EmailVerificationToken> {
-  const buffer = await randomBytes(32);
-  const token = buffer.toString("hex");
-  const hashedToken = await hashToken(token);
+export const generateEmailVerificationToken = (
+  userId: string,
+  expiresIn: string = "24h",
+) => {
+  const token = jwt.sign({ id: userId }, ENVIRONMENT.JWT.ACCESS_KEY, {
+    expiresIn,
+  });
+
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
-  return {
-    token,
-    hashedToken,
-    expiresAt,
-  };
-}
+  return { token, expiresAt };
+};
 
 /**
- * Verifies the email verification token
- * @param {string} token - The verification token sent to the user's email
- * @param {IUserDocument} user - The user document to verify the token against
- * @returns {Promise<boolean>} A promise that resolves to true if the token is valid and not expired, false otherwise
+ * Verifies an email verification token.
+ *
+ * @param token - The token to verify
+ * @returns The decoded token data if valid, null otherwise
  */
-export async function verifyEmailToken(
-  token: string,
-  user: IUserDocument,
-): Promise<boolean> {
-  console.log(user);
-  if (!user.emailVerificationToken || !user.emailVerificationExpiresAt) {
-    console.log("No token or expiration date in user document");
-    return false;
+export const verifyEmailToken = (token: string): ITokenData | null => {
+  try {
+    const decoded = jwt.verify(token, ENVIRONMENT.JWT.ACCESS_KEY) as ITokenData;
+    return decoded;
+  } catch (error) {
+    console.error("Error verifying email token:", error);
+    return null;
   }
-
-  const computedHash = await hashToken(token);
-  console.log(`Computed Hash: ${computedHash}`);
-  console.log(`Stored Hash: ${user.emailVerificationToken}`);
-
-  if (computedHash !== user.emailVerificationToken) {
-    console.log("Hash mismatch");
-    return false;
-  }
-  if (new Date() > user.emailVerificationExpiresAt) {
-    console.log("Token expired");
-    return false;
-  }
-  return true;
-}
+};
 
 /**
- * Hashes a token using SHA-256
- * @param {string} token - The token to hash
- * @returns {Promise<string>} A promise that resolves to the hashed token
+ * Checks if a token has expired.
+ *
+ * @param expirationDate - The expiration date of the token
+ * @returns True if the token has expired, false otherwise
  */
-export async function hashToken(token: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    crypto.scrypt(token, "salt", 64, (err, derivedKey) => {
-      if (err) reject(err);
-      resolve(derivedKey.toString("hex"));
-    });
-  });
-}
+export const isTokenExpired = (expirationDate: Date): boolean => {
+  return expirationDate < new Date();
+};

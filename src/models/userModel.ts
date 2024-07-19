@@ -1,5 +1,5 @@
 /**
- * @file User.ts
+ * @file userModel.ts
  * @description Defines the Mongoose schema and model for User documents in the application.
  */
 
@@ -8,12 +8,14 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
 import { IUser } from "../common/interfaces/user";
+import { ObjectId } from "mongoose";
 
 /**
  * Interface for User documents in the database.
  * Extends IUser (which defines basic user properties) and Document (for Mongoose document methods)
  */
 export interface IUserDocument extends IUser, Document {
+  _id: ObjectId;
   fullName: string; // Virtual property
   comparePassword(candidatePassword: string): Promise<boolean>; // Method to compare passwords
 }
