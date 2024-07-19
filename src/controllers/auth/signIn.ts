@@ -1,6 +1,13 @@
 import { Request, Response } from "express";
 import User from "../../models/userModel";
 import { Provider } from "../../common/constants";
+import { sendVerificationEmail } from "../../common/utils/sendVerificationEmail";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  setAccessTokenCookie,
+  setRefreshTokenCookie,
+} from "../../common/utils/helpers";
 
 export const signIn = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -23,5 +30,52 @@ export const signIn = async (req: Request, res: Response) => {
         message: "Invalid email or password",
       });
     }
-  } catch (error) {}
+
+    if (!user.isEmailVerified) {
+      const origin = `${req.protocol}://${req.get("host")}`;
+      await sendVerificationEmail(user, origin);
+
+      return res.status(403).json({
+        statusText: "fail",
+        message:
+          "Email not verified. Please check your email for verification instructions.",
+      });
+    }
+
+    // Generate tokens
+    const accessToken = generateAccessToken(user._id.toString());
+    const refreshToken = generateRefreshToken(user._id.toString());
+
+    // Set cookies
+    setAccessTokenCookie(res, accessToken);
+    setRefreshTokenCookie(res, refreshToken);
+
+    // Update refresh token in database
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.status(200).json({
+      statusText: "success",
+      message: "Sign in successful",
+      data: {
+        user: {
+          id: user._id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          role: user.role,
+        },
+        tokens: {
+          accessToken,
+          refreshToken,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Sign-in error:", error);
+    res.status(500).json({
+      statusText: "error",
+      message: "An error occurred during sign-in",
+    });
+  }
 };
