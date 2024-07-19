@@ -17,7 +17,7 @@ import { IUserDocument } from "../../models/userModel";
  */
 export const sendVerificationEmail = async (
   user: IUserDocument,
-  req: Request,
+  origin: string,
 ): Promise<void> => {
   const { token, expiresAt } = generateEmailVerificationToken(
     user._id.toString(),
@@ -31,9 +31,7 @@ export const sendVerificationEmail = async (
   // console.log("user", user);
   await user.save();
 
-  const verificationLink = `${req.protocol}://${req.get(
-    "host",
-  )}/verify-email?token=${token}`;
+  const verificationLink = `${origin}/api/v1/auth/verify-email?token=${token}`;
 
   await sendEmail({
     to: user.email,

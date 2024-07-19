@@ -61,7 +61,8 @@ export const signUp = async (req: Request, res: Response): Promise<void> => {
     });
 
     //send verification email
-    await sendVerificationEmail(newUser, req);
+    const origin = `${req.protocol}://${req.get("host")}`;
+    await sendVerificationEmail(newUser, origin);
 
     // Successful response
     res.status(201).json({

@@ -1,36 +1,61 @@
-// import { Request, Response } from 'express';
+import { Request, Response } from "express";
+import User from "../../models/userModel";
+import { isTokenExpired, verifyEmailToken } from "../../common/utils/email";
 
-// // import { verifyEmailToken, isTokenExpired } from '../services/emailUtils';
-// import User from '../../models/userModel';
-// import { isTokenExpired, verifyEmailToken } from '../../common/utils/email';
+export const verifyEmail = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const { token } = req.query;
 
-// export const verifyEmail = async (req: Request, res: Response): Promise<void> => {
-//   const { token } = req.query;
+  if (typeof token !== "string") {
+    console.log("Invalid token type:", token);
+    res.status(400).json({ message: "Invalid token" });
+    return;
+  }
 
-//   if (typeof token !== 'string') {
-//     res.status(400).json({ message: 'Invalid token' });
-//   }
+  try {
+    const decoded = verifyEmailToken(token);
+    console.log("Decoded token data:", decoded);
 
-//   const decoded = verifyEmailToken(token);
+    if (!decoded) {
+      res.status(400).json({ message: "Invalid token" });
+      return;
+    }
 
-//   if (!decoded) {
-//      res.status(400).json({ message: 'Invalid token' });
-//   }
+    const user = await User.findById(decoded.id);
+    console.log("Found user:", user);
 
-//   const user = await User.findById(decoded.id);
+    if (!user) {
+      res.status(400).json({ message: "Invalid token - user not found" });
+      return;
+    }
 
-//   if (!user || user.emailVerificationToken !== token) {
-//     res.status(400).json({ message: 'Invalid token' });
-//   }
+    console.log(
+      "User's email verification token:",
+      user.emailVerificationToken,
+    );
+    if (user.emailVerificationToken !== token) {
+      res.status(400).json({ message: "Invalid token - token mismatch" });
+      return;
+    }
 
-//   if (isTokenExpired(user.emailVerificationExpiresAt)) {
-//      res.status(400).json({ message: 'Token has expired' });
-//   }
+    if (
+      !user.emailVerificationExpiresAt ||
+      isTokenExpired(user.emailVerificationExpiresAt)
+    ) {
+      res.status(400).json({ message: "Token has expired" });
+      return;
+    }
 
-//   user.isEmailVerified = true;
-//   user.emailVerificationToken = undefined;
-//   user.emailVerificationExpiresAt = undefined;
-//   await user.save();
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpiresAt = null;
+    await user.save();
 
-//   res.json({ message: 'Email verified successfully' });
-// });
+    res.json({ message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
