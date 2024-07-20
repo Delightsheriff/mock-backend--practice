@@ -2,41 +2,50 @@ import { Request, Response } from "express";
 import User from "../../models/userModel";
 import { isTokenExpired, verifyEmailToken } from "../../common/utils/email";
 
+/**
+ * Verifies a user's email address using a token from query parameters.
+ *
+ * @param req - Express Request object containing the verification token in query params
+ * @param res - Express Response object used to send the result back to the client
+ */
 export const verifyEmail = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   const { token } = req.query;
 
-  if (typeof token !== "string") {
-    console.log("Invalid token type:", token);
-    res.status(400).json({ message: "Invalid token" });
+  if (!token || typeof token !== "string") {
+    res.status(400).json({
+      statusText: "error",
+      message: "Invalid or missing token. Please use the link from your email.",
+    });
     return;
   }
 
   try {
     const decoded = verifyEmailToken(token);
-    console.log("Decoded token data:", decoded);
-
     if (!decoded) {
-      res.status(400).json({ message: "Invalid token" });
+      res.status(400).json({
+        statusText: "error",
+        message: "Invalid verification link. Please request a new one.",
+      });
       return;
     }
 
     const user = await User.findById(decoded.id);
-    console.log("Found user:", user);
-
     if (!user) {
-      res.status(400).json({ message: "Invalid token - user not found" });
+      res.status(400).json({
+        statusText: "error",
+        message: "User not found. Please sign up or contact support.",
+      });
       return;
     }
 
-    console.log(
-      "User's email verification token:",
-      user.emailVerificationToken,
-    );
     if (user.emailVerificationToken !== token) {
-      res.status(400).json({ message: "Invalid token - token mismatch" });
+      res.status(400).json({
+        statusText: "error",
+        message: "Invalid verification link. Please request a new one.",
+      });
       return;
     }
 
@@ -44,7 +53,10 @@ export const verifyEmail = async (
       !user.emailVerificationExpiresAt ||
       isTokenExpired(user.emailVerificationExpiresAt)
     ) {
-      res.status(400).json({ message: "Token has expired" });
+      res.status(400).json({
+        statusText: "error",
+        message: "Verification link has expired. Please request a new one.",
+      });
       return;
     }
 
@@ -53,9 +65,21 @@ export const verifyEmail = async (
     user.emailVerificationExpiresAt = null;
     await user.save();
 
-    res.json({ message: "Email verified successfully" });
+    // Redirect to a success page or render a success message
+    res.redirect("/api/v1/auth/email-verified-success");
+    // Alternatively, if you prefer to send a JSON response:
+    // res.status(200).json({
+    //   statusText: "success",
+    //   message: "Email verified successfully. You can now log in to your account.",
+    // });
   } catch (error) {
-    console.error("Error verifying email:", error);
-    res.status(500).json({ message: "Internal server error" });
+    // Log the error for debugging
+    console.error("Email verification error:", error);
+
+    res.status(500).json({
+      statusText: "error",
+      message:
+        "An error occurred during email verification. Please try again later.",
+    });
   }
 };

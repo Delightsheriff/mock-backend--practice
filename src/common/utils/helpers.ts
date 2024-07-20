@@ -37,7 +37,7 @@ export const setCookie = (
  * @param expiresIn - Token expiration time
  * @returns The generated token
  */
-const generateToken = (
+export const generateToken = (
   payload: TokenPayload,
   secret: string,
   expiresIn: string,

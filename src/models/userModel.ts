@@ -9,6 +9,8 @@ import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
 import { IUser } from "../common/interfaces/user";
 import { ObjectId } from "mongoose";
+import { generateToken } from "../common/utils/helpers";
+import { ENVIRONMENT } from "../common/config/environment";
 
 /**
  * Interface for User documents in the database.
@@ -71,6 +73,10 @@ const UserSchema = new Schema<IUserDocument>(
     },
     emailVerificationToken: String,
     emailVerificationExpiresAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    passwordResetAttempts: { type: Number, default: 0 },
+    passwordChangedAt: Date,
     provider: {
       type: String,
       enum: Object.values(Provider), // Restricts values to those defined in Provider enum
@@ -146,6 +152,25 @@ UserSchema.methods.comparePassword = async function (
     return false;
   }
   return bcrypt.compare(candidatePassword, this.password);
+};
+
+/**
+ * Method to create a password reset token for the user
+ * Generates a JWT token with the user's ID and sets it as the passwordResetToken
+ * Also sets the passwordResetExpires field to 1 hour from the current time
+ * @returns The generated reset token
+ */
+
+UserSchema.methods.createPasswordResetToken = function (): string {
+  const resetToken = generateToken(
+    { id: this._id },
+    ENVIRONMENT.JWT.ACCESS_KEY!,
+    "1h",
+  );
+  this.passwordResetToken = resetToken;
+  this.passwordResetExpires = new Date(Date.now() + 3600000); // 1 hour
+  this.passwordResetAttempts = 0;
+  return resetToken;
 };
 
 /**
