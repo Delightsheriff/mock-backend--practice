@@ -17,7 +17,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
     const resetURL = `${req.protocol}://${req.get(
       "host",
-    )}/api/v1/auth/reset-password/${resetToken}`;
+    )}/api/v1/auth/password/reset-password/${resetToken}`;
 
     const message = `
       <h1>Forgot your password?</h1>

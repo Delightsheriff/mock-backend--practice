@@ -12,7 +12,7 @@ router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.get("/verify-email", verifyEmail);
 router.get("/email-verified-success", success);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
+router.post("/password/forgot-password", forgotPassword);
+router.post("/password/reset-password", resetPassword);
 
 export default router;
