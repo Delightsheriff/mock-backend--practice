@@ -10,8 +10,8 @@ export interface IUser {
   isEmailVerified: boolean;
   emailVerificationToken: string | null;
   emailVerificationExpiresAt: Date | null;
-  passwordResetToken: String;
-  passwordResetExpires: Date;
+  passwordResetToken: string | null;
+  passwordResetExpires: Date | null;
   passwordResetAttempts: { type: Number; default: 0 };
   passwordChangedAt: Date;
   provider: string;

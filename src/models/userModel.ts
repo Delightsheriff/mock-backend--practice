@@ -20,6 +20,7 @@ export interface IUserDocument extends IUser, Document {
   _id: ObjectId;
   fullName: string; // Virtual property
   comparePassword(candidatePassword: string): Promise<boolean>; // Method to compare passwords
+  createPasswordResetToken(): string; // Method to create a password reset token
 }
 
 /**
