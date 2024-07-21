@@ -5,6 +5,7 @@ import { signIn } from "../controllers/auth/signIn";
 import { success } from "../controllers/auth/sucess";
 import { forgotPassword } from "../controllers/auth/forgotPassword";
 import { resetPassword } from "../controllers/auth/resetPassword";
+import { resendVerificationEmail } from "../controllers/auth/resendVerificationEmail";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.get("/verify-email", verifyEmail);
 router.get("/email-verified-success", success);
+router.post("/resend-verification-email", resendVerificationEmail);
 router.post("/password/forgot-password", forgotPassword);
 router.post("/password/reset-password", resetPassword);
 
