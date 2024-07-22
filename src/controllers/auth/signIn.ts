@@ -65,7 +65,7 @@ export const signIn = async (req: Request, res: Response) => {
           email: user.email,
           role: user.role,
         },
-        tokens: {
+        session: {
           accessToken,
           refreshToken,
         },

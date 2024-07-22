@@ -16,6 +16,6 @@ export interface IUser {
   passwordChangedAt: Date;
   provider: string;
   googleId: string;
-  refreshToken: string;
+  refreshToken: string | null;
   properties: Schema.Types.ObjectId[] | null;
 }

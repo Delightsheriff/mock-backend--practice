@@ -98,3 +98,50 @@ export const setRefreshTokenCookie = (
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 };
+
+export class AuthenticationError extends Error {
+  statusCode: number;
+  statusText: string;
+
+  constructor(message: string, statusCode: number = 401) {
+    super(message);
+    this.name = "AuthenticationError";
+    this.statusCode = statusCode;
+    this.statusText = "fail";
+  }
+}
+
+/**
+ * Verifies a JWT token
+ * @param token - The token to verify
+ * @param secret - The secret key used to sign the token
+ * @returns The decoded token payload
+ * @throws AuthenticationError if the token is invalid
+ */
+const verifyToken = (token: string, secret: string): TokenPayload => {
+  try {
+    return jwt.verify(token, secret) as TokenPayload;
+  } catch (error) {
+    throw new AuthenticationError("Invalid token");
+  }
+};
+
+/**
+ * Verifies an access token
+ * @param accessToken - The access token to verify
+ * @returns The decoded access token payload
+ * @throws AuthenticationError if the token is invalid
+ */
+export const verifyAccessToken = (accessToken: string): TokenPayload => {
+  return verifyToken(accessToken, ENVIRONMENT.JWT.ACCESS_KEY);
+};
+
+/**
+ * Verifies a refresh token
+ * @param refreshToken - The refresh token to verify
+ * @returns The decoded refresh token payload
+ * @throws AuthenticationError if the token is invalid
+ */
+export const verifyRefreshToken = (refreshToken: string): TokenPayload => {
+  return verifyToken(refreshToken, ENVIRONMENT.JWT.REFRESH_KEY);
+};
