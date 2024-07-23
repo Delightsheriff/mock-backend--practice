@@ -7,7 +7,7 @@ import { forgotPassword } from "../controllers/auth/forgotPassword";
 import { resetPassword } from "../controllers/auth/resetPassword";
 import { resendVerificationEmail } from "../controllers/auth/resendVerificationEmail";
 import { protectRoute } from "../middleware/protectRoute";
-// import { signOut } from "../controllers/auth/signOut";
+import { signOut } from "../controllers/auth/signOut";
 
 const router = Router();
 
@@ -21,6 +21,6 @@ router.post("/password/reset-password", resetPassword);
 
 //TODO: implement protected routes
 router.use(protectRoute);
-// router.get("/signout", signOut);
+router.get("/signout", signOut);
 
 export default router;

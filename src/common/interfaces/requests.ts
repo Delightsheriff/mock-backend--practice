@@ -1,5 +1,6 @@
 import { Require_id } from "mongoose";
 import { IUserDocument } from "../../models/userModel";
+import { IUser } from "./user";
 // import { IUserDocument } from "../models/userModel";
 
 declare global {

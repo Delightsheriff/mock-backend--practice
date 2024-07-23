@@ -1,11 +1,10 @@
-// import { AppError, authenticate, setCookie } from "@/common/utils";
-// import { catchAsync } from "@/middlewares";
 import type { NextFunction, Request, Response } from "express";
 import { setAccessTokenCookie } from "../common/utils/helpers";
 import { authenticateUser } from "../common/utils/authenticateUser";
+import { IUserDocument } from "../models/userModel";
 
 export const protectRoute = async (
-  req: Request,
+  req: Request & { user?: IUserDocument },
   res: Response,
   next: NextFunction,
 ) => {
@@ -23,6 +22,7 @@ export const protectRoute = async (
 
   // attach the user to the request object
   req.user = currentUser;
+  console.log("Current user:", currentUser);
 
   next();
 };
