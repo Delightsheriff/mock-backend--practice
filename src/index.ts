@@ -18,6 +18,7 @@ import mongoSanitize from "express-mongo-sanitize";
 import { ENVIRONMENT } from "./common/config/environment";
 // import { authRouter } from "./routes/authRoutes";
 import authRoutes from "./routes/authRoutes";
+import userRoutes from "./routes/userRoutes";
 
 // Initialize Express application
 const app: Application = express();
@@ -64,9 +65,16 @@ if (ENVIRONMENT.APP.ENV === "development") {
 /**
  * API Auth routes
  * @route POST /api/v1/auth
- * @group Auth - Authentication and user management
+ * @group Auth - Authentication Management
  */
 app.use("/api/v1/auth", authRoutes);
+
+/**
+ * API User routes
+ * @route POST, PATCH, DELETE /api/v1/auth
+ * @group User - User Management
+ */
+app.use("/api/v1/user", userRoutes);
 
 /**
  * API welcome route
