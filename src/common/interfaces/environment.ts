@@ -20,4 +20,8 @@ export interface IEnvironment {
     ACCESS: string;
     REFRESH: string;
   };
+  STORAGE: {
+    AZURE_CONTAINER_NAME: string;
+    AZURE_STORAGE_CONNECTION_STRING: string;
+  };
 }

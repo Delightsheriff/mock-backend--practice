@@ -25,4 +25,8 @@ export const ENVIRONMENT: IEnvironment = {
     REFRESH: process.env.REFRESH_JWT_EXPIRES_IN!,
     ACCESS: process.env.ACCESS_JWT_EXPIRES_IN!,
   },
+  STORAGE: {
+    AZURE_CONTAINER_NAME: process.env.ACCOUNT_NAME!,
+    AZURE_STORAGE_CONNECTION_STRING: process.env.ACCOUNT_KEY!,
+  },
 };
