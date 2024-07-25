@@ -22,7 +22,6 @@ export const protectRoute = async (
 
   // attach the user to the request object
   req.user = currentUser;
-  console.log("Current user:", currentUser);
 
   next();
 };

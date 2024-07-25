@@ -67,11 +67,6 @@ export const verifyEmail = async (
 
     // Redirect to a success page or render a success message
     res.redirect("/api/v1/auth/email-verified-success");
-    // Alternatively, if you prefer to send a JSON response:
-    // res.status(200).json({
-    //   statusText: "success",
-    //   message: "Email verified successfully. You can now log in to your account.",
-    // });
   } catch (error) {
     // Log the error for debugging
     console.error("Email verification error:", error);

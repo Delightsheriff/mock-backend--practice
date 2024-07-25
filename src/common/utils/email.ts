@@ -20,9 +20,9 @@ export const generateEmailVerificationToken = (
 
 export const verifyEmailToken = (token: string): ITokenData | null => {
   try {
-    console.log("Token for verification:", token);
+    // console.log("Token for verification:", token);
     const decoded = jwt.verify(token, ENVIRONMENT.JWT.ACCESS_KEY) as ITokenData;
-    console.log("Decoded token:", decoded);
+    // console.log("Decoded token:", decoded);
     return decoded;
   } catch (error) {
     console.error("Error verifying email token:", error);
