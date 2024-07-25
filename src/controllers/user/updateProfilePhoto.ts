@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import User, { IUserDocument } from "../../models/userModel";
-import { uploadImage } from "../../common/utils/upload";
+import { deleteFile, uploadImage } from "../../common/utils/upload";
 
 interface AuthenticatedRequest extends Request {
   user?: IUserDocument;
-  file?: Express.Multer.File;
 }
 
 export const updateProfilePhoto = async (
@@ -29,18 +28,30 @@ export const updateProfilePhoto = async (
   }
 
   try {
-    const imageUrl = await uploadImage(file);
+    // Find the user and get the current image URL
+    const user = await User.findById(userID);
+    if (!user) {
+      return res.status(404).json({
+        statusText: "fail",
+        message: "User not found",
+      });
+    }
+
+    const oldImageUrl = user.imageUrl;
+
+    // Upload the new image
+    const newImageUrl = await uploadImage(file, 800, 800, 85);
+
+    // Update the user with the new image URL
     const updatedUser = await User.findByIdAndUpdate(
       userID,
-      { imageUrl: imageUrl },
+      { imageUrl: newImageUrl },
       { new: true },
     );
 
-    if (!updatedUser) {
-      return res.status(404).json({
-        statusText: "fail",
-        message: "user not found",
-      });
+    // If update was successful and there was an old image, delete it
+    if (updatedUser && oldImageUrl) {
+      await deleteFile(oldImageUrl);
     }
 
     res.status(200).json({
@@ -50,10 +61,10 @@ export const updateProfilePhoto = async (
       },
     });
   } catch (error) {
-    console.log("Update error: ", error);
+    console.error("Update error: ", error);
     res.status(500).json({
       statusText: "error",
-      message: "An error occured while updating user's photo",
+      message: "An error occurred while updating user's photo",
     });
   }
 };
