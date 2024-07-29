@@ -5,6 +5,6 @@ import { checkLandlords } from "../middleware/checkLandlords";
 const router = Router();
 
 router.use(protectRoute);
-router.use(checkLandlords);
+// router.use(checkLandlords);
 
 export default router;

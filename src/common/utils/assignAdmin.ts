@@ -8,7 +8,7 @@ interface AssignAdminResponse {
   message: string;
 }
 
-export async function assignAdmin(
+export async function notifyAdminForApproval(
   propertyId: Types.ObjectId,
 ): Promise<AssignAdminResponse> {
   try {

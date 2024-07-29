@@ -9,13 +9,16 @@ import { ENVIRONMENT } from "../config/environment";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5 MB limit
+    fileSize: 50 * 1024 * 1024, // 50 MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
+    if (
+      file.mimetype.startsWith("image/") ||
+      file.mimetype.startsWith("video/")
+    ) {
       cb(null, true);
     } else {
-      cb(new Error("Not an image! Please upload an image."));
+      cb(new Error("Invalid file type. Please upload an image or video."));
     }
   },
 });
@@ -82,6 +85,20 @@ export const uploadMultipleFiles = async (
 ): Promise<string[]> => {
   const uploadPromises = files.map((file) => uploadImage(file));
   return Promise.all(uploadPromises);
+};
+
+// Function to upload a video
+export const uploadVideo = async (
+  file: Express.Multer.File,
+): Promise<string> => {
+  const blobName = generateFileName(file.originalname);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  await blockBlobClient.uploadData(file.buffer, {
+    blobHTTPHeaders: {
+      blobContentType: file.mimetype,
+    },
+  });
+  return blockBlobClient.url;
 };
 
 export { upload };

@@ -1,4 +1,4 @@
-import mongoose, { Model, ObjectId, Schema } from "mongoose";
+import mongoose, { Model, Schema, Types } from "mongoose";
 import { IProperty } from "../common/interfaces/property";
 import {
   CommercialSubType,
@@ -19,7 +19,7 @@ import { amenitiesSchema } from "./amenitiesSchema";
  * @extends {Document}
  */
 export interface IPropertyDocument extends IProperty, Document {
-  _id: ObjectId;
+  _id: Types.ObjectId;
 }
 
 /**

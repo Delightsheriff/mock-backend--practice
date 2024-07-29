@@ -1,10 +1,8 @@
-import { Request, Response, NextFunction } from "express";
-import User, { IUserDocument } from "../models/userModel";
+import { Response, NextFunction } from "express";
+import User from "../models/userModel";
 import { Role } from "../common/constants";
+import { AuthenticatedRequest } from "./AuthenticatedRequest";
 
-interface AuthenticatedRequest extends Request {
-  user?: IUserDocument;
-}
 export const checkLandlords = async (
   req: AuthenticatedRequest,
   res: Response,
