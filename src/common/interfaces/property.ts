@@ -56,4 +56,7 @@ export interface IProperty {
   imagesUrl: string[];
   videoUrl?: string;
   ownerShipDocumentUrl: string;
+  price: number;
+  currency: string;
+  lastUpdated: Date;
 }

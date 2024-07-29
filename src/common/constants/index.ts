@@ -78,3 +78,9 @@ export enum VerificationStatus {
   Verified = "verified",
   Rejected = "rejected",
 }
+
+export enum Currency {
+  NGN = "NGN",
+  USD = "USD",
+  EUR = "EUR",
+}

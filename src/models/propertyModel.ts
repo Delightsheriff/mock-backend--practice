@@ -2,6 +2,7 @@ import mongoose, { Model, ObjectId, Schema } from "mongoose";
 import { IProperty } from "../common/interfaces/property";
 import {
   CommercialSubType,
+  Currency,
   IndustrialSubType,
   LandSubType,
   PropertyType,
@@ -11,78 +12,56 @@ import {
 } from "../common/constants";
 import { amenitiesSchema } from "./amenitiesSchema";
 
+/**
+ * Interface extending IProperty and Document for PropertySchema
+ * @interface IPropertyDocument
+ * @extends {IProperty}
+ * @extends {Document}
+ */
 export interface IPropertyDocument extends IProperty, Document {
   _id: ObjectId;
 }
 
+/**
+ * Mongoose schema definition for Property
+ * @constant PropertySchema
+ */
 const PropertySchema = new Schema<IPropertyDocument>(
   {
+    // Owner reference
     owner: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "Owner is required"],
     },
+
+    // Basic property information
     title: {
       type: String,
       required: [true, "Title is required"],
       trim: true,
+      maxlength: [100, "Title cannot be more than 100 characters"],
+    },
+    description: {
+      type: String,
+      required: [true, "Description is required"],
+      maxlength: [1000, "Description cannot be more than 1000 characters"],
     },
     purpose: {
       type: String,
       enum: Object.values(Purpose),
       required: [true, "Purpose is required"],
     },
-    amenities: {
-      type: amenitiesSchema,
-      required: [true, "Amenities is required"],
-    },
-    slots: {
-      type: Number,
-      required: [true, "Slots is required"],
-    },
-    description: {
-      type: String,
-      required: [true, "Description is required"],
-    },
-    bedrooms: {
-      type: Number,
-      required: [true, "Bedrooms is required"],
-    },
-    bathrooms: {
-      type: Number,
-      required: [true, "Bathrooms is required"],
-    },
-    toilets: {
-      type: Number,
-      required: [true, "Toilets is required"],
-    },
-    stateCapital: {
-      type: String,
-      required: [true, "State Capital is required"],
-    },
-    localGovernment: {
-      type: String,
-      required: [true, "Local Government is required"],
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
-    address: {
-      type: String,
-      required: [true, "Address is required"],
-    },
-    size: {
-      type: Number,
-      required: [true, "Size is required"],
-    },
+
+    // Property specifications
     propertyType: {
       type: String,
       enum: Object.values(PropertyType),
-      required: true,
+      required: [true, "Property type is required"],
     },
     subType: {
       type: String,
-      required: true,
+      required: [true, "Property sub-type is required"],
       validate: {
         validator: function (this: IProperty, v: string) {
           switch (this.propertyType) {
@@ -107,21 +86,95 @@ const PropertySchema = new Schema<IPropertyDocument>(
         message: "Invalid property sub-type for the selected property type.",
       },
     },
+    size: {
+      type: Number,
+      required: [true, "Size is required"],
+      min: [0, "Size cannot be negative"],
+    },
+    bedrooms: {
+      type: Number,
+      required: [true, "Number of bedrooms is required"],
+      min: [0, "Number of bedrooms cannot be negative"],
+    },
+    bathrooms: {
+      type: Number,
+      required: [true, "Number of bathrooms is required"],
+      min: [0, "Number of bathrooms cannot be negative"],
+    },
+    toilets: {
+      type: Number,
+      required: [true, "Number of toilets is required"],
+      min: [0, "Number of toilets cannot be negative"],
+    },
+    slots: {
+      type: Number,
+      required: [true, "Number of slots is required"],
+      min: [0, "Number of slots cannot be negative"],
+    },
+
+    // Location details
+    stateCapital: {
+      type: String,
+      required: [true, "State Capital is required"],
+    },
+    localGovernment: {
+      type: String,
+      required: [true, "Local Government is required"],
+    },
+    address: {
+      type: String,
+      required: [true, "Address is required"],
+    },
+
+    // Amenities
+    amenities: {
+      type: amenitiesSchema,
+      required: [true, "Amenities are required"],
+    },
+
+    // Verification and status
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
     verificationStatus: {
       type: String,
       enum: Object.values(VerificationStatus),
-      required: true,
+      required: [true, "Verification status is required"],
     },
+
+    // Media
     imagesUrl: {
       type: [String],
-      required: [true, "At Least one image is required"],
+      required: [true, "At least one image URL is required"],
+      validate: [
+        (array: string[]) => array.length > 0,
+        "At least one image URL is required",
+      ],
     },
     videoUrl: {
       type: String,
     },
     ownerShipDocumentUrl: {
       type: String,
-      required: [true, "At least one document URL is required"],
+      required: [true, "Ownership document URL is required"],
+    },
+
+    // Additional fields (suggested additions)
+    price: {
+      type: Number,
+      required: [true, "Price is required"],
+      min: [0, "Price cannot be negative"],
+    },
+    currency: {
+      type: String,
+      required: [true, "Currency is required"],
+      enum: Object.values(Currency),
+    },
+
+    lastUpdated: {
+      type: Date,
+      default: Date.now,
     },
   },
   {
@@ -131,8 +184,8 @@ const PropertySchema = new Schema<IPropertyDocument>(
 
 /**
  * Mongoose model for Property documents
+ * @constant Property
  */
-
 const Property: Model<IPropertyDocument> = mongoose.model<IPropertyDocument>(
   "Property",
   PropertySchema,

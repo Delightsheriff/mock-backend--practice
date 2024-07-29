@@ -10,6 +10,13 @@ export const checkLandlords = async (
   res: Response,
   next: NextFunction,
 ) => {
+  if (!req.user) {
+    return res.status(401).json({
+      statusText: "fail",
+      message: "Unauthorized: User not authenticated",
+    });
+  }
+
   try {
     const userID = req.user?._id;
 
@@ -26,7 +33,7 @@ export const checkLandlords = async (
     console.log("Error in checkLandlords: ", error);
     res.status(500).json({
       statusText: "error",
-      message: "An error occured while checking landlords",
+      message: "An error occurred while verifying user permissions",
     });
   }
 };
