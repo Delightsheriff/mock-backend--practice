@@ -26,10 +26,10 @@ export enum Purpose {
 }
 
 export enum PropertyType {
-  Residential = "residential",
-  Commercial = "commercial",
-  Industrial = "industrial",
-  Land = "land",
+  RESIDENTIAL = "residential",
+  COMMERCIAL = "commercial",
+  INDUSTRIAL = "industrial",
+  LAND = "land",
 }
 
 export enum ResidentialSubType {

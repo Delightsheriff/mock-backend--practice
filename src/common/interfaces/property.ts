@@ -9,7 +9,7 @@ import {
   VerificationStatus,
 } from "../constants";
 
-interface IAmenities {
+export interface IAmenities {
   furnished: boolean;
   parking: boolean;
   gym: boolean;
@@ -32,7 +32,7 @@ interface IAmenities {
 }
 
 export interface IProperty {
-  owner: Schema.Types.ObjectId[];
+  owner: Schema.Types.ObjectId;
   title: string;
   purpose: Purpose;
   amenities: IAmenities;
@@ -53,6 +53,7 @@ export interface IProperty {
     | IndustrialSubType
     | LandSubType;
   verificationStatus: VerificationStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  imagesUrl: string[];
+  videoUrl?: string;
+  ownerShipDocumentUrl: string;
 }
