@@ -18,4 +18,5 @@ export interface IUser {
   googleId: string;
   refreshToken: string | null;
   properties: Schema.Types.ObjectId[] | null;
+  propertiesToReview?: Schema.Types.ObjectId[] | null; // New field for admin reviews
 }

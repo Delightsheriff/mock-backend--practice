@@ -91,6 +91,12 @@ const UserSchema = new Schema<IUserDocument>(
         ref: "Property",
       },
     ],
+    propertiesToReview: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Property",
+      },
+    ],
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt fields
@@ -116,6 +122,26 @@ UserSchema.pre("save", function (this: IUserDocument, next) {
     this.properties = this.properties || [];
   } else {
     this.properties = null;
+  }
+  next();
+});
+
+/**
+ * Pre-save middleware to handle the propertiesToReview field based on user role
+ * Ensures ADMIN users have an array for propertiesToReview, while other roles have it null
+ */
+
+// Updated pre-save middleware to handle propertiesToReview
+UserSchema.pre("save", function (this: IUserDocument, next) {
+  if (this.role === Role.LANDLORD) {
+    this.properties = this.properties || [];
+    this.propertiesToReview = undefined;
+  } else if (this.role === Role.ADMIN) {
+    this.propertiesToReview = this.propertiesToReview || [];
+    this.properties = null;
+  } else {
+    this.properties = null;
+    this.propertiesToReview = undefined;
   }
   next();
 });
