@@ -19,6 +19,7 @@ import { ENVIRONMENT } from "./common/config/environment";
 // import { authRouter } from "./routes/authRoutes";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import propertyRoutes from "./routes/propertyRoutes";
 
 // Initialize Express application
 const app: Application = express();
@@ -75,6 +76,13 @@ app.use("/api/v1/auth", authRoutes);
  * @group User - User Management
  */
 app.use("/api/v1/user", userRoutes);
+
+/**
+ * API Property routes
+ * @route POST, PATCH, DELETE /api/v1/property
+ * @group Property - Property Management
+ */
+app.use("/api/v1/property", propertyRoutes);
 
 /**
  * API welcome route
