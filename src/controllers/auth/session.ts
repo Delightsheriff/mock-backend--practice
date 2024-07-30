@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
 import { IUserDocument } from "../../models/userModel";
-// import { AuthenticationError } from "../../common/utils/helpers";
 
 interface AuthenticatedRequest extends Request {
   user?: IUserDocument;
 }
 
 export const handleSession = async (
-  res: Response,
   req: AuthenticatedRequest,
+  res: Response,
 ) => {
   const currentUser = req.user;
   if (!currentUser) {
