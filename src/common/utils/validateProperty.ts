@@ -5,6 +5,7 @@ import {
   CommercialSubType,
   IndustrialSubType,
   LandSubType,
+  Currency,
 } from "../constants/index";
 
 interface ValidationResult {
@@ -26,14 +27,28 @@ export function validateProperty(data: any): ValidationResult {
   };
 
   // Check required fields
-  checkRequired("title", "Title");
-  checkRequired("purpose", "Purpose");
-  checkRequired("propertyType", "Property Type");
-  checkRequired("subType", "Sub Type");
-  checkRequired("description", "Description");
-  checkRequired("stateCapital", "State Capital");
-  checkRequired("localGovernment", "Local Government");
-  checkRequired("address", "Address");
+  const requiredFields = [
+    "title",
+    "description",
+    "purpose",
+    "propertyType",
+    "subType",
+    "size",
+    "bedrooms",
+    "bathrooms",
+    "toilets",
+    "slots",
+    "stateCapital",
+    "localGovernment",
+    "address",
+    "price",
+    "currency",
+    "videoUrl",
+    "ownerShipDocumentUrl",
+  ];
+  requiredFields.forEach((field) =>
+    checkRequired(field, field.charAt(0).toUpperCase() + field.slice(1)),
+  );
 
   // Validate purpose
   if (data.purpose && !Object.values(Purpose).includes(data.purpose)) {
@@ -50,7 +65,7 @@ export function validateProperty(data: any): ValidationResult {
 
   // Validate sub type based on property type
   if (data.propertyType && data.subType) {
-    let validSubTypes: string | any[];
+    let validSubTypes: string[];
     switch (data.propertyType) {
       case PropertyType.RESIDENTIAL:
         validSubTypes = Object.values(ResidentialSubType);
@@ -73,7 +88,14 @@ export function validateProperty(data: any): ValidationResult {
   }
 
   // Validate numeric fields
-  const numericFields = ["bedrooms", "bathrooms", "toilets", "size"];
+  const numericFields = [
+    "bedrooms",
+    "bathrooms",
+    "toilets",
+    "slots",
+    "size",
+    "price",
+  ];
   numericFields.forEach((field) => {
     if (data[field] !== undefined) {
       const value = Number(data[field]);
@@ -86,6 +108,11 @@ export function validateProperty(data: any): ValidationResult {
       }
     }
   });
+
+  // Validate currency
+  if (data.currency && !Object.values(Currency).includes(data.currency)) {
+    errors.push("Invalid currency");
+  }
 
   // Validate amenities
   if (data.amenities) {
@@ -118,6 +145,35 @@ export function validateProperty(data: any): ValidationResult {
         errors.push(`Amenity ${amenity} must be a boolean value`);
       }
     });
+  }
+
+  // Validate images
+  if (!Array.isArray(data.images) || data.images.length === 0) {
+    errors.push("At least one image is required");
+  } else {
+    data.images.forEach((image: any, index: number) => {
+      if (!image || typeof image !== "object" || !image.buffer) {
+        errors.push(`Invalid image at index ${index}`);
+      }
+    });
+  }
+
+  // Validate video URL (YouTube)
+  if (data.videoUrl) {
+    const youtubeRegex =
+      /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+    if (!youtubeRegex.test(data.videoUrl)) {
+      errors.push("Invalid YouTube video URL");
+    }
+  }
+
+  // Validate ownership document
+  if (
+    !data.ownershipDocument ||
+    typeof data.ownershipDocument !== "object" ||
+    !data.ownershipDocument.buffer
+  ) {
+    errors.push("Ownership document is required");
   }
 
   return {

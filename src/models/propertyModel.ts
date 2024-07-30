@@ -139,8 +139,8 @@ const PropertySchema = new Schema<IPropertyDocument>(
     },
     verificationStatus: {
       type: String,
+      default: VerificationStatus.Pending,
       enum: Object.values(VerificationStatus),
-      required: [true, "Verification status is required"],
     },
 
     // Media
