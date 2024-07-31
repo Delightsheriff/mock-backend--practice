@@ -5,7 +5,6 @@ import { validatePropertyData } from "../../common/utils/validateProperty";
 
 export async function postProperty(req: AuthenticatedRequest, res: Response) {
   try {
-    console.log("Body:", req.body); // Log the body to see what's coming through
     console.log("Files:", req.files);
     console.log("File:", req.file);
 
@@ -73,6 +72,13 @@ export async function postProperty(req: AuthenticatedRequest, res: Response) {
     //     propertyId: newProperty._id,
     //   },
     // });
+    return res.status(201).json({
+      success: true,
+      message: "Property submitted for approval",
+      data: {
+        test: req.body,
+      },
+    });
   } catch (error) {
     console.error("Error posting property:", error);
     return res.status(500).json({

@@ -1,4 +1,10 @@
 import { Currency, PropertyType, Purpose } from "../constants";
+import {
+  ResidentialSubType,
+  CommercialSubType,
+  IndustrialSubType,
+  LandSubType,
+} from "../constants";
 
 // Validation function
 export function validatePropertyData(data: any): string[] {
@@ -80,12 +86,6 @@ export function validatePropertyData(data: any): string[] {
 
   // Subtype validation
   if (data.propertyType && data.subType) {
-    const {
-      ResidentialSubType,
-      CommercialSubType,
-      IndustrialSubType,
-      LandSubType,
-    } = require("../common/constants");
     let validSubTypes: string | any[];
     switch (data.propertyType) {
       case PropertyType.RESIDENTIAL:
