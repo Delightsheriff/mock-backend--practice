@@ -14,11 +14,19 @@ const upload = multer({
   fileFilter: (req, file, cb) => {
     if (
       file.mimetype.startsWith("image/") ||
-      file.mimetype.startsWith("video/")
+      file.mimetype.startsWith("video/") ||
+      file.mimetype === "application/pdf" ||
+      file.mimetype === "application/msword" ||
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     ) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type. Please upload an image or video."));
+      cb(
+        new Error(
+          "Invalid file type. Please upload an image, video, or document (PDF, DOC, DOCX).",
+        ),
+      );
     }
   },
 });
@@ -79,14 +87,6 @@ export const deleteFile = async (fileUrl: string): Promise<void> => {
   await blockBlobClient.delete();
 };
 
-// Function to upload multiple files
-export const uploadMultipleFiles = async (
-  files: Express.Multer.File[],
-): Promise<string[]> => {
-  const uploadPromises = files.map((file) => uploadImage(file));
-  return Promise.all(uploadPromises);
-};
-
 // Function to upload a video
 export const uploadVideo = async (
   file: Express.Multer.File,
@@ -99,6 +99,36 @@ export const uploadVideo = async (
     },
   });
   return blockBlobClient.url;
+};
+
+// Function to upload a document
+export const uploadDocument = async (
+  file: Express.Multer.File,
+): Promise<string> => {
+  const blobName = generateFileName(file.originalname);
+  const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+  await blockBlobClient.uploadData(file.buffer, {
+    blobHTTPHeaders: {
+      blobContentType: file.mimetype,
+    },
+  });
+  return blockBlobClient.url;
+};
+
+// Function to upload multiple files of various types
+export const uploadMultipleFiles = async (
+  files: Express.Multer.File[],
+): Promise<string[]> => {
+  const uploadPromises = files.map((file) => {
+    if (file.mimetype.startsWith("image/")) {
+      return uploadImage(file);
+    } else if (file.mimetype.startsWith("video/")) {
+      return uploadVideo(file);
+    } else {
+      return uploadDocument(file);
+    }
+  });
+  return Promise.all(uploadPromises);
 };
 
 export { upload };

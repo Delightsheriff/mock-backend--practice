@@ -29,6 +29,9 @@ export interface IAmenities {
   cctv: boolean;
   churchNearby: boolean;
   mosqueNearby: boolean;
+  security: boolean;
+  waterSupply: boolean;
+  electricity: boolean;
 }
 
 export interface IProperty {

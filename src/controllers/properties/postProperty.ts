@@ -2,12 +2,16 @@ import { Response } from "express";
 import { AuthenticatedRequest } from "../../middleware/AuthenticatedRequest";
 import User from "../../models/userModel";
 import { validatePropertyData } from "../../common/utils/validateProperty";
+import Property from "../../models/propertyModel";
+import {
+  uploadDocument,
+  uploadMultipleFiles,
+  uploadVideo,
+} from "../../common/utils/upload";
+import { notifyAdminForApproval } from "../../common/utils/assignAdmin";
 
 export async function postProperty(req: AuthenticatedRequest, res: Response) {
   try {
-    console.log("Files:", req.files);
-    console.log("File:", req.file);
-
     if (!req.user) {
       return res.status(401).json({
         success: false,
@@ -72,11 +76,43 @@ export async function postProperty(req: AuthenticatedRequest, res: Response) {
     //     propertyId: newProperty._id,
     //   },
     // });
+    // return res.status(201).json({
+    //   success: true,
+    //   message: "Property submitted for approval",
+    //   data: {
+    //     test: req.body,
+    //   },
+    // });
+
+    // Handle file uploads
+    const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+    const imagesUrls = files.images
+      ? await uploadMultipleFiles(files.images)
+      : [];
+    const ownershipDocumentUrl = files.ownershipDocument
+      ? await uploadDocument(files.ownershipDocument[0])
+      : "";
+    const videoUrl = files.video ? await uploadVideo(files.video[0]) : "";
+
+    // Create a new property object
+    const newProperty = new Property({
+      ...req.body,
+      owner: req.user._id,
+      imagesUrl: imagesUrls,
+      ownerShipDocumentUrl: ownershipDocumentUrl,
+      videoUrl: videoUrl,
+      isVerified: false,
+      verificationStatus: "pending",
+    });
+
+    await newProperty.save();
+    await notifyAdminForApproval(newProperty._id);
+
     return res.status(201).json({
       success: true,
       message: "Property submitted for approval",
       data: {
-        test: req.body,
+        propertyId: newProperty._id,
       },
     });
   } catch (error) {
