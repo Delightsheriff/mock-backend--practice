@@ -3,12 +3,18 @@
  * @description Defines the Mongoose schema and model for User documents in the application.
  */
 
-import mongoose, { Schema, Model, Document, CallbackError } from "mongoose";
+import mongoose, {
+  Schema,
+  Model,
+  Document,
+  CallbackError,
+  Types,
+} from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import { Provider, Role } from "../common/constants";
 import { IUser } from "../common/interfaces/user";
-import { ObjectId } from "mongoose";
+// import { ObjectId } from "mongoose";
 import { generateToken } from "../common/utils/helpers";
 import { ENVIRONMENT } from "../common/config/environment";
 
@@ -17,7 +23,8 @@ import { ENVIRONMENT } from "../common/config/environment";
  * Extends IUser (which defines basic user properties) and Document (for Mongoose document methods)
  */
 export interface IUserDocument extends IUser, Document {
-  _id: ObjectId;
+  _id: Types.ObjectId;
+  // _id: Schema.Types.ObjectId;
   fullName: string; // Virtual property
   comparePassword(candidatePassword: string): Promise<boolean>; // Method to compare passwords
   createPasswordResetToken(): string; // Method to create a password reset token
@@ -85,12 +92,6 @@ const UserSchema = new Schema<IUserDocument>(
     },
     googleId: String,
     refreshToken: String,
-    properties: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Property",
-      },
-    ],
     propertiesToReview: [
       {
         type: Schema.Types.ObjectId,
@@ -114,34 +115,14 @@ UserSchema.virtual("fullName").get(function (this: IUserDocument) {
 });
 
 /**
- * Pre-save middleware to handle the properties field based on user role
- * Ensures LANDLORD users have an array for properties, while other roles have it null
- */
-UserSchema.pre("save", function (this: IUserDocument, next) {
-  if (this.role === Role.LANDLORD) {
-    this.properties = this.properties || [];
-  } else {
-    this.properties = null;
-  }
-  next();
-});
-
-/**
  * Pre-save middleware to handle the propertiesToReview field based on user role
- * Ensures ADMIN users have an array for propertiesToReview, while other roles have it null
+ * Ensures ADMIN users have an array for propertiesToReview, while other roles have it undefined
  */
-
-// Updated pre-save middleware to handle propertiesToReview
-UserSchema.pre("save", function (this: IUserDocument, next) {
-  if (this.role === Role.LANDLORD) {
-    this.properties = this.properties || [];
-    this.propertiesToReview = undefined;
-  } else if (this.role === Role.ADMIN) {
+UserSchema.pre<IUserDocument>("save", function (next) {
+  if (this.role === Role.ADMIN) {
     this.propertiesToReview = this.propertiesToReview || [];
-    this.properties = null;
   } else {
-    this.properties = null;
-    this.propertiesToReview = undefined;
+    this.propertiesToReview = null;
   }
   next();
 });

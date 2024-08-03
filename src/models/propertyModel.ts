@@ -176,6 +176,9 @@ const PropertySchema = new Schema<IPropertyDocument>(
       type: Date,
       default: Date.now,
     },
+    reviewComments: { type: String },
+    reviewedBy: { type: Schema.Types.ObjectId, ref: "User" },
+    reviewedAt: { type: Date },
   },
   {
     timestamps: true,

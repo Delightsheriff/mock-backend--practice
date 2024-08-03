@@ -48,43 +48,6 @@ export async function postProperty(req: AuthenticatedRequest, res: Response) {
     }
 
     // Handle file uploads
-    // const imagesUrls = await uploadImages(req.files.images);
-    // const ownershipDocumentUrl = await uploadOwnershipDocument(
-    //   req.files.ownershipDocument,
-    // );
-
-    // Create a new property object
-    // const newProperty: IPropertyDocument = new Property({
-    //   ...req.body,
-    //   owner: req.user._id,
-    //   imagesUrl: imagesUrls,
-    //   ownerShipDocumentUrl: ownershipDocumentUrl,
-    //   isVerified: false,
-    //   verificationStatus: "Pending",
-    // });
-
-    // Save the property to the database
-    // await newProperty.save();
-
-    // // Send for approval
-    // await sendForApproval(newProperty._id);
-
-    // return res.status(201).json({
-    //   success: true,
-    //   message: "Property submitted for approval",
-    //   data: {
-    //     propertyId: newProperty._id,
-    //   },
-    // });
-    // return res.status(201).json({
-    //   success: true,
-    //   message: "Property submitted for approval",
-    //   data: {
-    //     test: req.body,
-    //   },
-    // });
-
-    // Handle file uploads
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const imagesUrls = files.images
       ? await uploadMultipleFiles(files.images)

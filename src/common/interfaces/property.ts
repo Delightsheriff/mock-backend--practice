@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Types } from "mongoose";
 import {
   CommercialSubType,
   IndustrialSubType,
@@ -8,6 +8,7 @@ import {
   ResidentialSubType,
   VerificationStatus,
 } from "../constants";
+import mongoose from "mongoose";
 
 export interface IAmenities {
   furnished: boolean;
@@ -35,7 +36,7 @@ export interface IAmenities {
 }
 
 export interface IProperty {
-  owner: Schema.Types.ObjectId;
+  owner: Types.ObjectId;
   title: string;
   purpose: Purpose;
   amenities: IAmenities;
@@ -62,4 +63,7 @@ export interface IProperty {
   price: number;
   currency: string;
   lastUpdated: Date;
+  reviewComments?: string;
+  reviewedBy?: Types.ObjectId;
+  reviewedAt?: Date;
 }

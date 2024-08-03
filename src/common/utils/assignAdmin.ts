@@ -1,4 +1,3 @@
-import e from "express";
 import { Types } from "mongoose";
 import User from "../../models/userModel";
 import { Role } from "../constants";
@@ -16,6 +15,7 @@ export async function notifyAdminForApproval(
     const admins = await User.find({ role: Role.ADMIN });
 
     if (admins.length === 0) {
+      console.warn("No admin users found in the database");
       return {
         statusText: "fail",
         message: "No admin users available for property review",
@@ -26,11 +26,15 @@ export async function notifyAdminForApproval(
     const randomAdmin = admins[Math.floor(Math.random() * admins.length)];
 
     // Add the property to the selected admin's review list
-    await User.findByIdAndUpdate(
+    const updatedAdmin = await User.findByIdAndUpdate(
       randomAdmin._id,
       { $push: { propertiesToReview: propertyId } },
       { new: true, runValidators: true },
     );
+
+    if (!updatedAdmin) {
+      throw new Error("Failed to update admin with property to review");
+    }
 
     // Return success response
     return {
@@ -38,6 +42,7 @@ export async function notifyAdminForApproval(
       message: "Property assigned to admin for review",
     };
   } catch (error) {
+    console.error("Error in notifyAdminForApproval:", error);
     if (error instanceof Error) {
       return {
         statusText: "error",

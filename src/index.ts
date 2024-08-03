@@ -20,6 +20,7 @@ import { ENVIRONMENT } from "./common/config/environment";
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import propertyRoutes from "./routes/propertyRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
 // Initialize Express application
 const app: Application = express();
@@ -83,6 +84,12 @@ app.use("/api/v1/user", userRoutes);
  * @group Property - Property Management
  */
 app.use("/api/v1/property", propertyRoutes);
+
+/**
+ * API Admin routes
+ *
+ */
+app.use("/api/v1/admin", adminRoutes);
 
 /**
  * API welcome route
