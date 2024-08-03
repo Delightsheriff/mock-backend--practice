@@ -13,6 +13,7 @@ export async function notifyAdminForApproval(
   try {
     // Find all admin users
     const admins = await User.find({ role: Role.ADMIN });
+    // console.log("Admins:", admins);
 
     if (admins.length === 0) {
       console.warn("No admin users found in the database");
@@ -24,6 +25,7 @@ export async function notifyAdminForApproval(
 
     // Select a random admin
     const randomAdmin = admins[Math.floor(Math.random() * admins.length)];
+    // console.log("Random admin:", randomAdmin);
 
     // Add the property to the selected admin's review list
     const updatedAdmin = await User.findByIdAndUpdate(

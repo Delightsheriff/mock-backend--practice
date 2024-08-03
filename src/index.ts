@@ -87,6 +87,8 @@ app.use("/api/v1/property", propertyRoutes);
 
 /**
  * API Admin routes
+ * @route POST, PATCH, DELETE /api/v1/admin
+ * @group Admin - Admin Management
  *
  */
 app.use("/api/v1/admin", adminRoutes);
