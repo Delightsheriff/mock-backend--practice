@@ -21,7 +21,8 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import propertyRoutes from "./routes/propertyRoutes";
 import adminRoutes from "./routes/adminRoutes";
-import bodyParser from "body-parser";
+import testRental from "./routes/testRental";
+// import bodyParser from "body-parser";
 
 // Initialize Express application
 const app: Application = express();
@@ -87,6 +88,13 @@ app.use("/api/v1/user", userRoutes);
  * @group Property - Property Management
  */
 app.use("/api/v1/property", propertyRoutes);
+
+/**
+ * API Rental Payments
+ * @route POST
+ * @group Rental - Rental Payments
+ */
+app.use("/api/v1/rental", testRental);
 
 /**
  * API Admin routes
