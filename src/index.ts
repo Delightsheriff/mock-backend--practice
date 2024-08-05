@@ -21,6 +21,7 @@ import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import propertyRoutes from "./routes/propertyRoutes";
 import adminRoutes from "./routes/adminRoutes";
+import bodyParser from "body-parser";
 
 // Initialize Express application
 const app: Application = express();
@@ -35,6 +36,8 @@ app.use(cors());
 
 // 3. Parse incoming JSON payloads (limit to 10kb to prevent large payload attacks)
 app.use(express.json({ limit: "10kb" }));
+
+// app.use(bodyParser.json());
 
 // 4. Parse cookies
 app.use(cookieParser());

@@ -30,4 +30,7 @@ export const ENVIRONMENT: IEnvironment = {
     AZURE_STORAGE_CONNECTION_STRING:
       process.env.AZURE_STORAGE_CONNECTION_STRING!,
   },
+  PAYSTACK: {
+    PAYSTACK_SECRET_KEY: process.env.PAYSTACK_SECRET_KEY!,
+  },
 };
