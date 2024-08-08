@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import https from "https";
-import { ENVIRONMENT } from "../common/config/environment";
+import { ENVIRONMENT } from "../../common/config/environment";
+// import { ENVIRONMENT } from "../common/config/environment";
 
 interface PaymentRequest {
   email: string;
