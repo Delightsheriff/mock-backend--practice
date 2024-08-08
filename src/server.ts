@@ -5,9 +5,9 @@
  * and handling graceful shutdowns. It serves as the main entry point for the application.
  */
 
-import { ENVIRONMENT } from "./common/config/environment";
 import app from "./index";
 import { connectDb } from "./common/config/database";
+import { ENVIRONMENT } from "./common/config/environment";
 
 /**
  * Starts the server and initializes the database connection.

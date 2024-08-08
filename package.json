@@ -8,9 +8,6 @@
     "serve": "node dist/server.js",
     "dev": "nodemon"
   },
-  "engines": {
-    "node": "^16.0.0"
-  },
   "keywords": [],
   "author": "Amadi-Sheriff Delight",
   "license": "ISC",
