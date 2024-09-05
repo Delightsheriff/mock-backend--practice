@@ -44,10 +44,10 @@ export interface IProperty {
   description: string;
   bedrooms: number;
   bathrooms: number;
+  address: string;
   stateCapital: string;
   localGovernment: string;
   isVerified: boolean;
-  address: string;
   size: number;
   toilets: number;
   propertyType: PropertyType;
