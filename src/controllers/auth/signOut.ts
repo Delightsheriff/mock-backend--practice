@@ -18,7 +18,7 @@ export const signOut = async (req: AuthenticatedRequest, res: Response) => {
 
   try {
     // console.log("User:", .user);
-    console.log("User ID:", temp._id);
+    // console.log("User ID:", temp._id);
 
     await User.findByIdAndUpdate(temp._id, { $unset: { refreshToken: 1 } });
 

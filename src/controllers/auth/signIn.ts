@@ -58,13 +58,7 @@ export const signIn = async (req: Request, res: Response) => {
       statusText: "success",
       message: "Sign in successful",
       data: {
-        user: {
-          id: user._id,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          role: user.role,
-        },
+        user,
         session: {
           accessToken,
           refreshToken,

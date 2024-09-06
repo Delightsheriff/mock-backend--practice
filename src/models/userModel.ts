@@ -79,16 +79,17 @@ const UserSchema = new Schema<IUserDocument>(
       type: Boolean,
       default: false,
     },
-    emailVerificationToken: String,
-    emailVerificationExpiresAt: Date,
-    passwordResetToken: String,
-    passwordResetExpires: Date,
-    passwordResetAttempts: { type: Number, default: 0 },
-    passwordChangedAt: Date,
+    emailVerificationToken: { type: String, select: false },
+    emailVerificationExpiresAt: { type: Date, select: false },
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
+    passwordResetAttempts: { type: Number, default: 0, select: false },
+    passwordChangedAt: { type: Date, select: false },
     provider: {
       type: String,
       enum: Object.values(Provider), // Restricts values to those defined in Provider enum
       default: Provider.Local,
+      select: false,
     },
     googleId: String,
     refreshToken: String,
@@ -96,6 +97,7 @@ const UserSchema = new Schema<IUserDocument>(
       {
         type: Schema.Types.ObjectId,
         ref: "Property",
+        select: false, // Excludes property from being returned when querying documents
       },
     ],
   },
