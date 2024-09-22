@@ -35,7 +35,7 @@ export const verifyEmail = async (
     const user = await User.findById(decoded.id).select(
       "+emailVerificationToken +emailVerificationExpiresAt",
     );
-    console.log(user);
+    // console.log(user);
     if (!user) {
       res.status(400).json({
         statusText: "error",
