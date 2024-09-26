@@ -23,11 +23,13 @@ export const setCookie = (
 ) => {
   res.cookie(name, value, {
     httpOnly: true,
-    secure: ENVIRONMENT.APP.ENV === "production",
+    secure: true,
+    // secure: ENVIRONMENT.APP.ENV === "production",
     path: "/",
     sameSite: "none",
     ...options,
   });
+
 };
 
 /**

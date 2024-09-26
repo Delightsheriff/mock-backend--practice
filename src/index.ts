@@ -34,6 +34,14 @@ app.use(helmet());
 
 // 2. Enable Cross-Origin Resource Sharing (CORS)
 app.use(cors());
+//Middleware to allow CORS from frontend
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+    exposedHeaders: ["Set-Cookie"],
+  }),
+);
 
 // 3. Parse incoming JSON payloads (limit to 10kb to prevent large payload attacks)
 app.use(express.json({ limit: "10kb" }));
