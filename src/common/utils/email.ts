@@ -14,7 +14,7 @@ export const generateEmailVerificationToken = (
   });
 
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
-  console.log("Generated token:", token);
+  // console.log("Generated token:", token);
   return { token, expiresAt };
 };
 
@@ -22,7 +22,7 @@ export const verifyEmailToken = (token: string): ITokenData | null => {
   try {
     // console.log("Token for verification:", token);
     const decoded = jwt.verify(token, ENVIRONMENT.JWT.ACCESS_KEY) as ITokenData;
-    console.log("Decoded token:", decoded);
+    // console.log("Decoded token:", decoded);
     return decoded;
   } catch (error) {
     console.error("Error verifying email token:", error);
