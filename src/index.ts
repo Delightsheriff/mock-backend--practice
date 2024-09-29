@@ -32,9 +32,7 @@ const app: Application = express();
 // 1. Set security-related HTTP headers
 app.use(helmet());
 
-// 2. Enable Cross-Origin Resource Sharing (CORS)
-app.use(cors());
-//Middleware to allow CORS from frontend
+// 2. Enable Cross-Origin Resource Sharing (CORS) {Middleware to allow CORS from frontend}
 app.use(
   cors({
     origin: ["http://localhost:3000", "http://localhost:3001"],
