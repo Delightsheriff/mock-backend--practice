@@ -54,11 +54,15 @@ export const signIn = async (req: Request, res: Response) => {
     user.refreshToken = refreshToken;
     await user.save();
 
+    // Create a user object without sensitive information
+    const userWithoutSensitiveInfo = user.toObject();
+    delete userWithoutSensitiveInfo.password;
+
     res.status(200).json({
       statusText: "success",
       message: "Sign in successful",
       data: {
-        user,
+        user: userWithoutSensitiveInfo,
         session: {
           accessToken,
           refreshToken,
