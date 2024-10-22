@@ -23,10 +23,11 @@ export const setCookie = (
 ) => {
   res.cookie(name, value, {
     httpOnly: true,
-    // secure: true,
-    secure: ENVIRONMENT.APP.ENV === "production", // Only use secure in production
+    secure: false,
+    // secure: ENVIRONMENT.APP.ENV === "production", // Only use secure in production
     path: "/",
-    sameSite: ENVIRONMENT.APP.ENV === "production" ? "none" : "lax", // Use 'lax' for local development
+    // sameSite: ENVIRONMENT.APP.ENV === "production" ? "none" : "lax", // Use 'lax' for local development
+    sameSite: "none",
 
     ...options,
   });
